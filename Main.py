@@ -15,7 +15,7 @@ import liquid2
 
 pymunk.pygame_util.positive_y_is_up = False
 pg.init()
-RES = WIDTH, HEIGHT = 800, 800
+RES = WIDTH, HEIGHT = 700, 700
 FPS = 60
 surface = pg.display.set_mode(RES)
 clock = pg.time.Clock()
@@ -32,7 +32,7 @@ liquid_mass, liquid_radius = 10, 6
 def game():
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
     Robot_maker2.Boundaries(space, WIDTH, HEIGHT)
-    rem = Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space)
+    rem = Robot_maker2.Robot(10, (RES[0]/2, RES[1]/2),space)
     liquid = liquid2.Liquid(RES, 25,space)
     while True:
         for event in pg.event.get():
@@ -42,7 +42,7 @@ def game():
         # for every robot you have to draw it in this section this also allows the robot to move
         rem.draw()
         liquid.draw()
-        liquid.drawsprings()
+        #liquid.drawsprings()
         pg.display.update()
         clock.tick(FPS)
         space.step(1/FPS)

@@ -73,8 +73,8 @@ class Liquid():
     def draw(self):
         for particle in self.particles:
             particle.draw()
-        for edge_points in self.edges.bodies:
-            pg.draw.circle(surface, (0,0,0), edge_points.position, 10)
+        #for edge_points in self.edges.bodies:
+            #pg.draw.circle(surface, (0,0,0), edge_points.position, 10)
     def drawsprings(self):
         for springs in self.springs:
             springs.draw()
@@ -97,7 +97,7 @@ create_boundaries(space, WIDTH, HEIGHT)
 
 class Edge_Points():
     def __init__(self, RES, diviser, space):
-        top,bottom,left,right,self.bodiest,self.bodiesr,self.bodiesb,self.bodiesl = [],[],[],[],[],[],[],[]
+        top,bottom,left,right,self.bodies = [],[],[],[],[]
         for i in range(0,diviser):
             pos1 = (0,RES[1]/diviser*i)
             left.append(pos1)
@@ -110,22 +110,22 @@ class Edge_Points():
         for i in left:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
             body.position = i
-            self.bodiesl.append(body)
+            self.bodies.append(body)
         for i in right:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
             body.position = i
-            self.bodiesr.append(body)
+            self.bodies.append(body)
         for i in bottom:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
             body.position = i
-            self.bodiesb.append(body)
+            self.bodies.append(body)
         for i in top:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
             body.position = i
-            self.bodiest.append(body)
-        self.bodies = self.bodiesb + self.bodiesl + self.bodiest + self.bodiesr
-        for i in self.bodies:
-            print(i.position)
+            self.bodies.append(body)
+
+
+
 #Edge_Points(RES, 10, space)
 #def game():
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
