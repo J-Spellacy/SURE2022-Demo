@@ -31,7 +31,7 @@ def positions(size, num):
             y = (size -(size // num)*i) - ball_radius*2
             plist.append([x, y])
     return plist
-pos = positions(500, 35)
+pos = positions(500, 15)
 for i in pos:
     x = i[0]
     y = i[1]

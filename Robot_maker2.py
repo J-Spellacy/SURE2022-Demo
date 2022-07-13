@@ -5,6 +5,7 @@ import pymunk.pygame_util
 import random
 import math
 import pymunk.constraints
+import pickle
 
 pymunk.pygame_util.positive_y_is_up = False
 
@@ -21,7 +22,7 @@ base_density, base_elasticity, base_friction = 1, 0.4, 0.9
 muscle_density, muscle_elasticity, muscle_friction = 1, 0.5, 0.5
 
 class Node():
-    def __init__(self, x, y):
+    def __init__(self, x, y,space):
         self.body = pymunk.Body()
         self.body.position = x, y
         self.shape = pymunk.Circle(self.body, node_radius)
@@ -41,7 +42,7 @@ class Node():
         pg.draw.circle(surface, self.shape.color, self.body.position, node_radius)
 
 class String():
-    def __init__(self, a, b):
+    def __init__(self, a, b,space):
         self.body1 = a
         self.body2 = b
         joint = pymunk.PinJoint(self.body1, self.body2)
@@ -52,7 +53,7 @@ class String():
         pg.draw.line(surface, (70, 60, 200), pos1, pos2, 2)
 
 class Muscle():
-    def __init__(self, a, b):
+    def __init__(self, a, b,space):
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
@@ -76,7 +77,7 @@ class Muscle():
         pg.draw.line(surface, (140, 20, 30), self.body1.position, self.body2.position, 2)
 
 class Mixed_Muscle():
-    def __init__(self, a, b):
+    def __init__(self, a, b,space):
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
@@ -104,8 +105,8 @@ def calc_angle(p1, p2):
     #gives radians of angle assume p2 is origin
     return math.atan2(p2[1] - p1[1], p2[0] - p1[0])
 
-class robot():
-    def __init__(self, size, i_pos):
+class Robot():
+    def __init__(self, size, i_pos,space):
         positions, alldists = [], []
         Cangles, Cdistances = [], []
         for i in range(0, size):
@@ -122,25 +123,25 @@ class robot():
         self.alldists = alldists
         nodes = []
         for i in positions:
-            node = Node(i[0], i[1])
+            node = Node(i[0], i[1], space)
             nodes.append(node)
             self.nodes = nodes
         strings, muscles = [], []
-        connections_num = random.randint(size,len(self.nodes)*(len(self.nodes)-1)/2)
+        connections_num = random.randint(2,size*(size-1)/2)
         sample = random.choices(self.nodes, k = connections_num)
         for i in sample:
             for a in self.nodes:
                 if i.type == 0 and a.type == 0 and a != i:
-                    string = String(i.body,a.body)
+                    string = String(i.body,a.body,space)
                     strings.append(string)
                 elif i.type == 1 and a.type == 1 and a != i:
-                    muscle = Muscle(i.body,a.body)
+                    muscle = Muscle(i.body,a.body,space)
                     muscles.append(muscle)
                 elif i.type == 1 and a.type == 0 and a != i:
-                    muscle = Mixed_Muscle(i.body,a.body)
+                    muscle = Mixed_Muscle(i.body,a.body,space)
                     muscles.append(muscle)
                 elif i.type == 0 and a.type == 1 and a != i:
-                    muscle = Mixed_Muscle(i.body,a.body)
+                    muscle = Mixed_Muscle(i.body,a.body,space)
                     muscles.append(muscle)
         self.muscles = muscles
         self.strings = strings
@@ -155,35 +156,36 @@ class robot():
             i.draw()
 
 
-def create_boundaries(space, width, height):
-    rects = [
-        [(width/2, height), (width, 1)],
-        [(width / 2, 0), (width, 1)],
-        [(0, height/2), (1, height)],
-        [(width, height/2), (1, height)],
-    ]
-    for position, size in rects:
-        body = pymunk.Body(body_type = pymunk.Body.STATIC)
-        body.position = position
-        shape = pymunk.Poly.create_box(body, size)
-        shape.elasticity = 0.2
-        shape.friction = 0.4
-        space.add(body, shape)
-create_boundaries(space, WIDTH, HEIGHT)
+class Boundaries():
+        def __init__(self,space, width, height):
+            rects = [
+                [(width/2, height), (width, 1)],
+                [(width / 2, 0), (width, 1)],
+                [(0, height/2), (1, height)],
+                [(width, height/2), (1, height)],
+            ]
+            for position, size in rects:
+                body = pymunk.Body(body_type = pymunk.Body.STATIC)
+                body.position = position
+                shape = pymunk.Poly.create_box(body, size)
+                shape.elasticity = 0.2
+                shape.friction = 0.4
+                space.add(body, shape)
+Boundaries(space, WIDTH, HEIGHT)
 
-def game():
+#def game():
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
-    rem = robot(5, (200, 200))
-    while True:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                return
-        surface.fill((255, 255, 255))
-        # for every robot you have to draw it in this section this also allows the robot to move
-        rem.draw()
-        pg.display.update()
-        clock.tick(FPS)
-        space.step(1/FPS)
+    #rem = Robot(5, (200, 200))
+    #while True:
+     #   for event in pg.event.get():
+     #       if event.type == pg.QUIT:
+     #           return
+     #   surface.fill((255, 255, 255))
+     #   # for every robot you have to draw it in this section this also allows the robot to move
+     #   rem.draw()
+     #   pg.display.update()
+     #   clock.tick(FPS)
+     #   space.step(1/FPS)
 
-game()
-pg.quit()
+#game()
+#pg.quit()
