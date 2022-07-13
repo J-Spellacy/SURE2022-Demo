@@ -1,7 +1,6 @@
 # second try at liquid simulation
 import pygame as pg
 import pymunk.pygame_util
-import random
 import math
 import pymunk.constraints
 
