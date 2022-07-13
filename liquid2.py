@@ -6,9 +6,9 @@ import math
 import pymunk.constraints
 
 pg.init()
-RES = WIDTH, HEIGHT = 500, 500
+RESo = WIDTH, HEIGHT = 500, 500
 FPS = 60
-surface = pg.display.set_mode(RES)
+surface = pg.display.set_mode(RESo)
 clock = pg.time.Clock()
 draw_options = pymunk.pygame_util.DrawOptions(surface)
 space = pymunk.Space()
@@ -36,7 +36,7 @@ class Spring():
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
-        joint = pymunk.DampedSpring(self.body1, self.body2, (0, 0), (0, 0), self.length, 10000, 0.8)
+        joint = pymunk.DampedSpring(self.body1, self.body2, (0, 0), (0, 0), self.length, 10000, 8)
         space.add(joint)
     def draw(self):
         pg.draw.line(surface, (140, 20, 30), self.body1.position, self.body2.position, 2)
@@ -65,6 +65,7 @@ class Liquid():
                     self.spring = Spring(particle.body, particle2.body,space)
                     self.springs.append(self.spring)
         self.edges = Edge_Points(RES, diviser, space)
+        print(RES)
         for bodies in self.edges.bodies:
             for i in self.particles:
                 if calc_distance(bodies.position,i.body.position) <= RES[0]/diviser and calc_distance(bodies.position,i.body.position) <= RES[1]/diviser:
@@ -73,8 +74,8 @@ class Liquid():
     def draw(self):
         for particle in self.particles:
             particle.draw()
-        #for edge_points in self.edges.bodies:
-         #   pg.draw.circle(surface, (0,0,0), edge_points.position, 10)
+        for edge_points in self.edges.bodies:
+            pg.draw.circle(surface, (0,0,0), edge_points.position, 10)
     def drawsprings(self):
         for springs in self.springs:
             springs.draw()
@@ -101,11 +102,11 @@ class Edge_Points():
         for i in range(0,diviser):
             pos1 = (0,RES[1]/diviser*i)
             left.append(pos1)
-            pos2 = (WIDTH,RES[1]/diviser*i)
+            pos2 = (RES[0],RES[1]/diviser*i)
             right.append(pos2)
             pos3 = (RES[0]/diviser*i,0)
             bottom.append(pos3)
-            pos4 = (RES[0]/diviser*i,HEIGHT)
+            pos4 = (RES[0]/diviser*i,RES[1])
             top.append(pos4)
         for i in left:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
@@ -126,7 +127,7 @@ class Edge_Points():
         self.bodies = self.bodiesb + self.bodiesl + self.bodiest + self.bodiesr
         for i in self.bodies:
             print(i.position)
-Edge_Points(RES, 10, space)
+#Edge_Points(RES, 10, space)
 #def game():
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
  #   liquid = Liquid(RES, 20)
