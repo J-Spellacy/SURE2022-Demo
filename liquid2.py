@@ -35,7 +35,7 @@ class Spring():
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
-        joint = pymunk.DampedSpring(self.body1, self.body2, (0, 0), (0, 0), self.length, 10000, 8)
+        joint = pymunk.DampedSpring(self.body1, self.body2, (0, 0), (0, 0), self.length, 10000, 40)
         space.add(joint)
     def draw(self):
         pg.draw.line(surface, (140, 20, 30), self.body1.position, self.body2.position, 2)
@@ -60,14 +60,13 @@ class Liquid():
             self.particles.append(self.particle)
         for particle in self.particles:
             for particle2 in self.particles:
-                if calc_distance(particle.body.position, particle2.body.position) <= (RES[0]/diviser)  and calc_distance(particle.body.position, particle2.body.position) <= (RES[1]/diviser) and particle != particle2:
+                if calc_distance(particle.body.position, particle2.body.position) <= (RES[0]/diviser) and particle != particle2 or calc_distance(particle.body.position, particle2.body.position) <= (RES[1]/diviser) and particle != particle2:
                     self.spring = Spring(particle.body, particle2.body,space)
                     self.springs.append(self.spring)
         self.edges = Edge_Points(RES, diviser, space)
-        print(RES)
         for bodies in self.edges.bodies:
             for i in self.particles:
-                if calc_distance(bodies.position,i.body.position) <= RES[0]/diviser and calc_distance(bodies.position,i.body.position) <= RES[1]/diviser:
+                if calc_distance(bodies.position,i.body.position) <= RES[0]/diviser or calc_distance(bodies.position,i.body.position) <= RES[1]/diviser:
                     spr = Spring(bodies, i.body,space)
                     self.springs.append(spr)
     def draw(self):

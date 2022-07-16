@@ -22,11 +22,14 @@ base_density, base_elasticity, base_friction = 1, 0.4, 0.9
 muscle_density, muscle_elasticity, muscle_friction = 1, 0.5, 0.5
 
 class Node():
-    def __init__(self, x, y,space):
+    def __init__(self, x, y,space,gen,type):
         self.body = pymunk.Body()
         self.body.position = x, y
         self.shape = pymunk.Circle(self.body, node_radius)
-        self.type = random.randrange(0, 2)
+        if gen != 1:
+          self.type = type
+        else:
+            self.type = random.randrange(0, 2)
         if self.type == 0:
             self.shape.density = base_density
             self.shape.elasticity = base_elasticity
@@ -54,6 +57,7 @@ class String():
 
 class Muscle():
     def __init__(self, a, b,space):
+        self.mtype = 1
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
@@ -78,6 +82,7 @@ class Muscle():
 
 class Mixed_Muscle():
     def __init__(self, a, b,space):
+        self.mtype =  0
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
@@ -106,30 +111,46 @@ def calc_angle(p1, p2):
     return math.atan2(p2[1] - p1[1], p2[0] - p1[0])
 
 class Robot():
-    def __init__(self, size, i_pos,space):
+    def __init__(self, size, i_pos,space,gen,n_pos,types,samp):
+        self.gen = gen
+        self.size = size
+        self.i_pos = i_pos
+        print(i_pos)
         positions, alldists = [], []
         Cangles, Cdistances = [], []
-        for i in range(0, size):
-            pos = (random.randrange(i_pos[0]-100, i_pos[0]+100),random.randrange(i_pos[1]-100, i_pos[1]+100))
-            positions.append(pos)
-            self.positions = positions
-            for a in positions:
-                for b in positions:
-                    d = calc_distance(a, b)
-                    alldists.append(d)
-        alldists = list(dict.fromkeys(alldists))
-        if 0 in alldists:
-            alldists.remove(0)
-        self.alldists = alldists
+        if gen == 1:
+            for i in range(0, size):
+                pos = (random.randrange(i_pos[0]-100, i_pos[0]+100),random.randrange(i_pos[1]-100, i_pos[1]+100))
+                positions.append(pos)
+                self.positions = positions
+                for a in positions:
+                    for b in positions:
+                        d = calc_distance(a, b)
+                        alldists.append(d)
+            alldists = list(dict.fromkeys(alldists))
+            if 0 in alldists:
+                alldists.remove(0)
+            self.alldists = alldists
+        else:
+            positions = n_pos
         nodes = []
-        for i in positions:
-            node = Node(i[0], i[1], space)
-            nodes.append(node)
-            self.nodes = nodes
+        if gen == 1:
+            for i in positions:
+                node = Node(i[0], i[1], space,gen,[])
+                nodes.append(node)
+                self.nodes = nodes
+        elif gen != 1:
+            for (i,j) in zip(positions,types):
+                node = Node(i[0], i[1], space,gen,j)
+                nodes.append(node)
+                self.nodes = nodes
         strings, muscles = [], []
         connections_num = random.randint(2,size*(size-1)/2)
-        sample = random.choices(self.nodes, k = connections_num)
-        for i in sample:
+        if gen == 1:
+            self.sample = random.choices(self.nodes, k = connections_num)
+        else:
+            self.sample =  samp
+        for i in self.sample:
             for a in self.nodes:
                 if i.type == 0 and a.type == 0 and a != i:
                     string = String(i.body,a.body,space)
@@ -155,6 +176,13 @@ class Robot():
         for i in self.strings:
             i.draw()
 
+    def record(self):
+        current_positions = [0, 0]
+        for i in self.nodes:
+            current_positions[0] += i.body.position[0]
+            current_positions[1] += i.body.position[1]
+        self.avg_position  = (current_positions[0]/self.size,current_positions[1]/self.size)
+        print(self.avg_position)
 
 class Boundaries():
         def __init__(self,space, width, height):
