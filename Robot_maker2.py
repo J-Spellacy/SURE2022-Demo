@@ -40,7 +40,7 @@ class Node():
             self.shape.elasticity = muscle_elasticity
             self.shape.friction = muscle_friction
             self.shape.color = (255, 0, 0, 100)
-        space.add(self.body, self.shape)
+        #space.add(self.body, self.shape)
     def draw(self):
         pg.draw.circle(surface, self.shape.color, self.body.position, node_radius)
 
@@ -48,8 +48,8 @@ class String():
     def __init__(self, a, b,space):
         self.body1 = a
         self.body2 = b
-        joint = pymunk.PinJoint(self.body1, self.body2)
-        space.add(joint)
+        self.joint = pymunk.PinJoint(self.body1, self.body2)
+        #space.add(joint)
     def draw(self):
         pos1 = self.body1.position
         pos2 = self.body2.position
@@ -61,8 +61,8 @@ class Muscle():
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
-        joint  = pymunk.DampedSpring(self.body1, self.body2, (0,0), (0,0), self.length, 500, 0.5)
-        space.add(joint)
+        self.joint  = pymunk.DampedSpring(self.body1, self.body2, (0,0), (0,0), self.length, 500, 0.5)
+        #space.add(joint)
     def contract(self):
         self.angle = calc_angle(self.body1.position, self.body2.position)
         force = self.length
@@ -86,8 +86,8 @@ class Mixed_Muscle():
         self.body1 = a
         self.body2 = b
         self.length = calc_distance(a.position, b.position)
-        joint  = pymunk.DampedSpring(self.body1, self.body2, (0,0), (0,0), calc_distance(self.body1.position, self.body2.position), 900, 9)
-        space.add(joint)
+        self.joint  = pymunk.DampedSpring(self.body1, self.body2, (0,0), (0,0), calc_distance(self.body1.position, self.body2.position), 900, 9)
+        #space.add(joint)
     def contract(self):
         self.angle = calc_angle(self.body1.position, self.body2.position)
         force = self.length/1
@@ -111,13 +111,12 @@ def calc_angle(p1, p2):
     return math.atan2(p2[1] - p1[1], p2[0] - p1[0])
 
 class Robot():
-    def __init__(self, size, i_pos,space,gen,n_pos,types,samp):
+    def __init__(self, size, i_pos, space, gen, n_pos):
         self.gen = gen
         self.size = size
         self.i_pos = i_pos
-        print(i_pos)
-        positions, alldists = [], []
-        Cangles, Cdistances = [], []
+        #print(i_pos)
+        positions, alldists, nodes = [], [],[]
         if gen == 1:
             for i in range(0, size):
                 pos = (random.randrange(i_pos[0]-100, i_pos[0]+100),random.randrange(i_pos[1]-100, i_pos[1]+100))
@@ -131,25 +130,22 @@ class Robot():
             if 0 in alldists:
                 alldists.remove(0)
             self.alldists = alldists
-        else:
-            positions = n_pos
-        nodes = []
-        if gen == 1:
             for i in positions:
                 node = Node(i[0], i[1], space,gen,[])
                 nodes.append(node)
                 self.nodes = nodes
         elif gen != 1:
-            for (i,j) in zip(positions,types):
+            positions = n_pos
+            for p in positions:
+                #print(i,j)
+                i = p[0]
+                j = p[1]
                 node = Node(i[0], i[1], space,gen,j)
                 nodes.append(node)
                 self.nodes = nodes
         strings, muscles = [], []
         connections_num = random.randint(2,size*(size-1)/2)
-        if gen == 1:
-            self.sample = random.choices(self.nodes, k = connections_num)
-        else:
-            self.sample =  samp
+        self.sample = random.choices(self.nodes, k = connections_num)
         for i in self.sample:
             for a in self.nodes:
                 if i.type == 0 and a.type == 0 and a != i:
@@ -167,6 +163,14 @@ class Robot():
         self.muscles = muscles
         self.strings = strings
 
+    def Add_to_space(self,space):
+        for i in self.strings:
+            space.add(i.joint)
+        for i in self.nodes:
+            space.add(i.body,i.shape)
+        for i in self.muscles:
+            space.add(i.joint)
+
     def draw(self):
         for i in self.nodes:
             i.draw()
@@ -182,7 +186,7 @@ class Robot():
             current_positions[0] += i.body.position[0]
             current_positions[1] += i.body.position[1]
         self.avg_position  = (current_positions[0]/self.size,current_positions[1]/self.size)
-        print(self.avg_position)
+        print(self.avg_position,self.gen)
 
 class Boundaries():
         def __init__(self,space, width, height):

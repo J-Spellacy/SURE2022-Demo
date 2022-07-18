@@ -32,7 +32,8 @@ liquid_mass, liquid_radius = 10, 6
 def game():
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
     Robot_maker2.Boundaries(space, WIDTH, HEIGHT)
-    rem = Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space,1,[],[],[])
+    rem = Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space,1,[])
+    rem.Add_to_space(space)
     liquid = liquid2.Liquid(RES, 30,space)
     while True:
         for event in pg.event.get():
