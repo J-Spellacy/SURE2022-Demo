@@ -145,7 +145,13 @@ class Robot():
                 self.nodes = nodes
         strings, muscles = [], []
         connections_num = random.randint(2,size*(size-1)/2)
-        self.sample = random.choices(self.nodes, k = connections_num)
+        if gen == 1:
+            self.sample = random.choices(self.nodes, k = connections_num)
+        if gen != 1:
+            self.sample = []
+            for B,j in zip(positions,self.nodes):
+                if B[2] is True:
+                    self.sample.append(j)
         for i in self.sample:
             for a in self.nodes:
                 if i.type == 0 and a.type == 0 and a != i:
@@ -186,7 +192,7 @@ class Robot():
             current_positions[0] += i.body.position[0]
             current_positions[1] += i.body.position[1]
         self.avg_position  = (current_positions[0]/self.size,current_positions[1]/self.size)
-        print(self.avg_position,self.gen)
+        return calc_distance(self.avg_position,self.i_pos)
 
 class Boundaries():
         def __init__(self,space, width, height):

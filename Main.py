@@ -4,6 +4,7 @@
 # needs to save performance metrics alongside model
 # either on here or on another file needs to cut down generations with gradient with respect to amount of muscle and distance from pos_i
 import pygame as pg
+import pygame.time
 import pymunk.pygame_util
 import random
 import math
@@ -11,6 +12,7 @@ import pymunk.constraints
 import pickle
 import Robot_maker2
 import liquid2
+import Saver
 
 
 pymunk.pygame_util.positive_y_is_up = False
@@ -27,19 +29,26 @@ base_density, base_elasticity, base_friction = 1, 0.4, 0.9
 muscle_density, muscle_elasticity, muscle_friction = 1, 0.5, 0.5
 liquid_mass, liquid_radius = 10, 6
 
+#for i in range(0,100):
+rem = Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space,1,[])#Saver.load() #Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space,1,[])
+#Saver.save(rem)
 
-
-def game():
+def game(rob_for_sim):
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
     Robot_maker2.Boundaries(space, WIDTH, HEIGHT)
-    rem = Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space,1,[])
+    rem = rob_for_sim
     rem.Add_to_space(space)
     liquid = liquid2.Liquid(RES, 30,space)
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                rem.record()
+                score = rem.record()
+                print(score)
                 return
+        if pygame.time.get_ticks() > 20000:
+            score = rem.record()
+            print(score)
+            return
         surface.fill((255, 255, 255))
         # for every robot you have to draw it in this section this also allows the robot to move
         rem.draw()
@@ -49,5 +58,5 @@ def game():
         clock.tick(FPS)
         space.step(1/FPS)
 
-game()
+game(rem)
 pg.quit()

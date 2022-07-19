@@ -41,7 +41,11 @@ class Robot_combine():
             an1 = i.body.position[0] - a.i_pos[0]
             an2 = i.body.position[1] - a.i_pos[1]
             norm_pos = (an1+position[0],an2+position[1])
-            positionsa.append([norm_pos,t])
+            in_sample = False
+            for j in a.sample:
+                if i == j:
+                    in_sample = True
+            positionsa.append([norm_pos, t, in_sample])
             #typesa.append(t)
             #for j in a.sample:
             #    if i == j:
@@ -51,7 +55,11 @@ class Robot_combine():
             bn1 = i.body.position[0] - b.i_pos[0]
             bn2 = i.body.position[1] - b.i_pos[1]
             norm_pos = (bn1 + position[0],bn2+ position[1])
-            positionsb.append([norm_pos,t])
+            in_sample = False
+            for j in b.sample:
+                if i == j:
+                    in_sample = True
+            positionsb.append([norm_pos, t, in_sample])
             #typesb.append(t)
             #for j in b.sample:
             #    if i == j:
@@ -62,8 +70,11 @@ class Robot_combine():
         mutation_chance = random.randint(0,mut)
         if mutation_chance == 0:
             pos.pop(random.randrange(len(pos)))
-            pos.append([(random.randrange(position[0]-100, position[0]+100),random.randrange(position[1]-100, position[1]+100)),random.randint(0,1)])
+            pos.append([(random.randrange(position[0]-100, position[0]+100),random.randrange(position[1]-100, position[1]+100)),random.randint(0,1),bool(random.getrandbits(1))])
             print("mutated")
+        if len(pos) < length:
+            pos.append([(random.randrange(position[0]-100, position[0]+100),random.randrange(position[1]-100, position[1]+100)),random.randint(0,1),bool(random.getrandbits(1))])
+            print("special mutate")
         self.Child = Robot_maker2.Robot(length,position,space,gen,pos)
 
 robot1 = Robot_maker2.Robot(5,(110,110),space,1,[])
@@ -76,6 +87,9 @@ robot2.Add_to_space(space)
 robot3.Child.Add_to_space(space)
 robot4.Child.Add_to_space(space)
 robot5.Child.Add_to_space(space)
+
+
+
 def game():
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
     Robot_maker2.Boundaries(space, WIDTH, HEIGHT)
