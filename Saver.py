@@ -24,12 +24,23 @@ muscle_density, muscle_elasticity, muscle_friction = 1, 0.5, 0.5
 liquid_mass, liquid_radius = 10, 6
 
 
-def save(object):
+def save_R(object):
+    file_to_store = open("stored_robot.pickle", "wb")
+    pickle.dump(object, file_to_store)
+    file_to_store.close()
+
+def load_R():
+    file_to_read = open("stored_robot.pickle", "rb")
+    loaded_robot = pickle.load(file_to_read)
+    file_to_read.close()
+    return loaded_robot
+
+def save_L(object):
     file_to_store = open("stored_object.pickle", "wb")
     pickle.dump(object, file_to_store)
     file_to_store.close()
 
-def load():
+def load_L():
     file_to_read = open("stored_object.pickle", "rb")
     loaded_object = pickle.load(file_to_read)
     file_to_read.close()

@@ -13,6 +13,7 @@ import pickle
 import Robot_maker2
 import liquid2
 import Saver
+import time
 
 
 pymunk.pygame_util.positive_y_is_up = False
@@ -28,10 +29,7 @@ node_radius = 7
 base_density, base_elasticity, base_friction = 1, 0.4, 0.9
 muscle_density, muscle_elasticity, muscle_friction = 1, 0.5, 0.5
 liquid_mass, liquid_radius = 10, 6
-
-#for i in range(0,100):
-rem = Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space,1,[])#Saver.load() #Robot_maker2.Robot(5, (RES[0]/2, RES[1]/2),space,1,[])
-#Saver.save(rem)
+Robots = []
 
 def game(rob_for_sim):
     # This is the place to call more robots or test specific orientations you can change the number of nodes as well as initial position below:
@@ -45,10 +43,10 @@ def game(rob_for_sim):
                 score = rem.record()
                 print(score)
                 return
-        if pygame.time.get_ticks() > 20000:
+        if pygame.time.get_ticks() > 35000:
             score = rem.record()
             print(score)
-            return
+            return score
         surface.fill((255, 255, 255))
         # for every robot you have to draw it in this section this also allows the robot to move
         rem.draw()
@@ -58,5 +56,13 @@ def game(rob_for_sim):
         clock.tick(FPS)
         space.step(1/FPS)
 
-game(rem)
-pg.quit()
+scores = []
+for i in range(0,20):
+    R = Robot_maker2.Robot(5, (RES[0] / 2, RES[1] / 2), space, 1, [])
+    time.sleep(5)
+    score = game(R)
+    scores.append(score)
+    Robots.append(R)
+Saver.save_L(scores)
+Saver.save_R(Robots)
+#pg.quit()
